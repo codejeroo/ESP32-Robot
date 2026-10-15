@@ -1,0 +1,7 @@
+{
+  "url": "https://cad.onshape.com/documents/7fdcb55562a96810991061bd/w/7d5ac8f955a3dac2ff2d7f45/e/b62d95d33c773ee3148a519f",
+  "outputFormat": "urdf",
+  "drawCollisions": false,
+  "jointMaxEffort": 2.5,
+  "jointMaxVelocity": 10.0
+}

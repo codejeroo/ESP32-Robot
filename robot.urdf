@@ -1,0 +1,221 @@
+<?xml version="1.0" ?>
+<!-- Generated using onshape-to-robot -->
+<!-- Onshape https://cad.onshape.com/documents/7fdcb55562a96810991061bd/w/7d5ac8f955a3dac2ff2d7f45/e/b62d95d33c773ee3148a519f -->
+<robot name="ESP32-Robot">
+  <!-- Link part_1 -->
+  <link name="part_1">
+    <inertial>
+      <origin xyz="0.00444575 0.00770616 -0.0070872" rpy="0 0 0"/>
+      <mass value="0.222036"/>
+      <inertia ixx="0.000748572" ixy="5.82837e-06" ixz="2.33543e-06" iyy="0.00108581" iyz="-7.27808e-07" izz="0.00177234"/>
+    </inertial>
+    <!-- Part tt_motor___single_sided -->
+    <visual>
+      <origin xyz="0.0929445 0.0707125 -0.0174299" rpy="0 -0 1.5708"/>
+      <geometry>
+        <mesh filename="assets/tt_motor___single_sided.stl"/>
+      </geometry>
+      <material name="tt_motor___single_sided_material">
+        <color rgba="0.615686 0.811765 0.929412 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.0929445 0.0707125 -0.0174299" rpy="0 -0 1.5708"/>
+      <geometry>
+        <mesh filename="assets/tt_motor___single_sided.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part part_1 -->
+    <visual>
+      <origin xyz="0.00387347 0.00801641 -0.0063299" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="assets/part_1.stl"/>
+      </geometry>
+      <material name="part_1_material">
+        <color rgba="0.615686 0.811765 0.929412 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.00387347 0.00801641 -0.0063299" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="assets/part_1.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part tt_motor___single_sided_2 -->
+    <visual>
+      <origin xyz="0.0929445 -0.0546797 -0.0174299" rpy="-3.14159 0 -1.5708"/>
+      <geometry>
+        <mesh filename="assets/tt_motor___single_sided.stl"/>
+      </geometry>
+      <material name="tt_motor___single_sided_2_material">
+        <color rgba="0.615686 0.811765 0.929412 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.0929445 -0.0546797 -0.0174299" rpy="-3.14159 0 -1.5708"/>
+      <geometry>
+        <mesh filename="assets/tt_motor___single_sided.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part tt_motor___single_sided_3 -->
+    <visual>
+      <origin xyz="-0.0781265 -0.0576086 -0.0174299" rpy="-0 0 -1.5708"/>
+      <geometry>
+        <mesh filename="assets/tt_motor___single_sided.stl"/>
+      </geometry>
+      <material name="tt_motor___single_sided_3_material">
+        <color rgba="0.615686 0.811765 0.929412 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0.0781265 -0.0576086 -0.0174299" rpy="-0 0 -1.5708"/>
+      <geometry>
+        <mesh filename="assets/tt_motor___single_sided.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part tt_motor___single_sided_4 -->
+    <visual>
+      <origin xyz="-0.0851976 0.0707125 -0.0174299" rpy="-3.14159 0 1.5708"/>
+      <geometry>
+        <mesh filename="assets/tt_motor___single_sided.stl"/>
+      </geometry>
+      <material name="tt_motor___single_sided_4_material">
+        <color rgba="0.615686 0.811765 0.929412 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0.0851976 0.0707125 -0.0174299" rpy="-3.14159 0 1.5708"/>
+      <geometry>
+        <mesh filename="assets/tt_motor___single_sided.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link rueda_01 -->
+  <link name="rueda_01">
+    <inertial>
+      <origin xyz="1.471e-09 -7.87e-10 0.00808802" rpy="0 0 0"/>
+      <mass value="0.0456157"/>
+      <inertia ixx="1.8438e-05" ixy="0" ixz="-0" iyy="1.84378e-05" iyz="0" izz="3.38736e-05"/>
+    </inertial>
+    <!-- Part rueda_01 -->
+    <visual>
+      <origin xyz="0 0 -0.0025" rpy="-1.5708 -1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/rueda_01.stl"/>
+      </geometry>
+      <material name="rueda_01_material">
+        <color rgba="1 0.937255 0.137255 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.0025" rpy="-1.5708 -1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/rueda_01.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Joint from part_1 to rueda_01 -->
+  <joint name="back_left_wheel" type="continuous">
+    <origin xyz="-0.0781265 -0.0716836 -0.0174299" rpy="1.5708 0.737462 -0"/>
+    <parent link="part_1"/>
+    <child link="rueda_01"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10"/>
+  </joint>
+  <!-- Link rueda_01_2 -->
+  <link name="rueda_01_2">
+    <inertial>
+      <origin xyz="1.471e-09 -7.87e-10 0.00808802" rpy="0 0 0"/>
+      <mass value="0.0456157"/>
+      <inertia ixx="1.8438e-05" ixy="0" ixz="-0" iyy="1.84378e-05" iyz="0" izz="3.38736e-05"/>
+    </inertial>
+    <!-- Part rueda_01_2 -->
+    <visual>
+      <origin xyz="-0 -0 -0.0025" rpy="-1.5708 -1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/rueda_01.stl"/>
+      </geometry>
+      <material name="rueda_01_2_material">
+        <color rgba="1 0.937255 0.137255 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0 -0 -0.0025" rpy="-1.5708 -1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/rueda_01.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Joint from part_1 to rueda_01_2 -->
+  <joint name="front_left_wheel" type="continuous">
+    <origin xyz="0.0929445 -0.0687547 -0.0174299" rpy="1.5708 -0.678958 0"/>
+    <parent link="part_1"/>
+    <child link="rueda_01_2"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10"/>
+  </joint>
+  <!-- Link rueda_01_3 -->
+  <link name="rueda_01_3">
+    <inertial>
+      <origin xyz="1.471e-09 -7.87e-10 0.00808802" rpy="0 0 0"/>
+      <mass value="0.0456157"/>
+      <inertia ixx="1.8438e-05" ixy="0" ixz="-0" iyy="1.84378e-05" iyz="0" izz="3.38736e-05"/>
+    </inertial>
+    <!-- Part rueda_01_3 -->
+    <visual>
+      <origin xyz="0 0 -0.0025" rpy="-1.5708 -1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/rueda_01.stl"/>
+      </geometry>
+      <material name="rueda_01_3_material">
+        <color rgba="1 0.937255 0.137255 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.0025" rpy="-1.5708 -1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/rueda_01.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Joint from part_1 to rueda_01_3 -->
+  <joint name="back_right_wheel" type="continuous">
+    <origin xyz="-0.0851976 0.0847875 -0.0174299" rpy="-1.5708 -1.27829 -0"/>
+    <parent link="part_1"/>
+    <child link="rueda_01_3"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10"/>
+  </joint>
+  <!-- Link rueda_01_4 -->
+  <link name="rueda_01_4">
+    <inertial>
+      <origin xyz="1.471e-09 -7.87e-10 0.00808802" rpy="0 0 0"/>
+      <mass value="0.0456157"/>
+      <inertia ixx="1.8438e-05" ixy="0" ixz="-0" iyy="1.84378e-05" iyz="0" izz="3.38736e-05"/>
+    </inertial>
+    <!-- Part rueda_01_4 -->
+    <visual>
+      <origin xyz="0 0 -0.0025" rpy="-1.5708 -1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/rueda_01.stl"/>
+      </geometry>
+      <material name="rueda_01_4_material">
+        <color rgba="1 0.937255 0.137255 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.0025" rpy="-1.5708 -1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/rueda_01.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Joint from part_1 to rueda_01_4 -->
+  <joint name="front_right_wheel" type="continuous">
+    <origin xyz="0.0929445 0.0847875 -0.0174299" rpy="-1.5708 -0.439417 -0"/>
+    <parent link="part_1"/>
+    <child link="rueda_01_4"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10"/>
+  </joint>
+</robot>
