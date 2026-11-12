@@ -4,7 +4,7 @@ CAD-to-simulation pipeline for a 4-wheel rover designed in [Onshape](https://cad
 The CAD model is exported to URDF, then converted to a Webots PROTO for simulation.
 
 ```
-Onshape CAD ──(onshape-to-robot)──▶ robot.urdf + assets/*.stl ──(urdf2webots)──▶ Rover.proto
+Onshape CAD ──(generate.py)──▶ robot.urdf + protos/<name>.proto + protos/assets/
 ```
 
 ## Repository layout
@@ -29,7 +29,7 @@ Onshape CAD ──(onshape-to-robot)──▶ robot.urdf + assets/*.stl ──(u
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install onshape-to-robot urdf2webots
+pip install -r requirements.txt
 
 cp .env.example .env    # then fill in your Onshape keys
 ```
@@ -39,18 +39,32 @@ The key's account must have access to the document referenced in `config.json`.
 `onshape-to-robot` loads `.env` automatically (python-dotenv), so running from the
 repo root is enough — no manual `source .env` needed.
 
-## Step 1 — Onshape → URDF
+## Automated generation
 
-Run from the repo root (where `config.json` lives):
+`generate.py` runs the Onshape export and Webots conversion as one workflow.
+Run it from any directory after activating the environment and creating `.env`:
 
 ```bash
-onshape-to-robot
+python generate.py --name Rover
 ```
 
-This downloads the assembly, resolves joints, and writes:
+This writes `robot.urdf` at the repository root and writes `Rover.proto` plus
+its referenced meshes under `protos/`. The PROTO name is required. Optional
+`--config PATH` and `--output-dir PATH` arguments select another configuration
+or output location. The script stages the export and conversion before replacing
+the existing PROTO and generated mesh files.
 
-- `robot.urdf` — the robot description
-- `assets/*.stl` — one mesh per part (+ `.part` metadata files)
+Use another simple Webots identifier for each robot, such as:
+
+```bash
+python generate.py --name Kristel
+python generate.py --name Rover --output-dir ./simulation/protos
+```
+
+Dependencies are listed in `requirements.txt`. Install them in the active
+virtual environment with `pip install -r requirements.txt`. The script does not
+install packages. Each user must supply their own Onshape credentials in `.env`
+and have access to the document in the selected config.
 
 ### config.json reference
 
@@ -73,26 +87,11 @@ the Onshape document:
 
 ```bash
 onshape-to-robot-clear-cache
-onshape-to-robot
+python generate.py --name Rover
 ```
 
-## Step 2 — URDF → Webots PROTO
-
-Run **from the repo root** so the relative `assets/...` mesh paths resolve:
-
-```bash
-python -m urdf2webots.importer \
-    --input=robot.urdf \
-    --output=Rover.proto \
-    --robot-name=Rover
-```
-
-Outputs:
-
-- `Rover.proto` — the robot PROTO (header states the source URDF and target Webots version)
-- `Rover_textures/` — texture folder; **it being empty is normal** (the URDF has
-  no texture materials, colors are exported as flat `PBRAppearance` values)
-- Mesh URLs stay as `assets/...`, matching the existing folder — no copy step needed
+The generated PROTO uses relative `assets/...` mesh paths. Keep the PROTO next to
+the matching `assets/` folder when moving or using the output in Webots.
 
 ### Useful urdf2webots options
 
