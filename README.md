@@ -1,10 +1,13 @@
 # ESP32-Robot
 
 CAD-to-simulation pipeline for a 4-wheel rover designed in [Onshape](https://cad.onshape.com).
-The CAD model is exported to URDF, then converted to a Webots PROTO for simulation.
+The CAD model is exported to URDF, then packaged as a Webots PROTO project with its
+meshes and the `rover_drive` controller.
 
 ```
-Onshape CAD ──(generate.py)──▶ robot.urdf + protos/<name>.proto + protos/assets/
+Onshape CAD ──(generate.py)──▶ robot.urdf + generated/<name>/
+                                             ├── protos/<name>.proto + assets/
+                                             └── controllers/rover_drive/
 ```
 
 ## Repository layout
@@ -15,14 +18,13 @@ Onshape CAD ──(generate.py)──▶ robot.urdf + protos/<name>.proto + prot
 | `.env` | Onshape API credentials (gitignored — never commit it) |
 | `.env.example` | Template for the credentials file |
 | `robot.urdf` | URDF description generated from the Onshape assembly |
-| `assets/` | STL meshes (+ `.part` metadata) referenced by the URDF |
-| `Rover.proto` | Webots PROTO of the rover (root copy, sits next to `assets/`) |
-| `protos/` | Second conversion output (`Rover.proto` + its own `assets/` copy) |
+| `generated/<name>/` | Shareable Webots project folder for the named robot |
+| `generated/<name>/protos/` | Named PROTO and matching `assets/` meshes |
+| `generated/<name>/controllers/rover_drive/` | Python drive controller and runtime settings |
 | `.venv/` | Python virtual environment |
 
-> The PROTO references its meshes with **relative** paths (`assets/...`), so a
-> `.proto` file only works when it sits next to an `assets/` folder containing
-> those meshes. That is why `protos/` carries its own copy.
+The PROTO references meshes with relative `assets/...` paths. Keep the PROTO
+inside `protos/` beside its `assets/` directory when sharing or moving the package.
 
 ## Setup
 
@@ -41,30 +43,59 @@ repo root is enough — no manual `source .env` needed.
 
 ## Automated generation
 
-`generate.py` runs the Onshape export and Webots conversion as one workflow.
-Run it from any directory after activating the environment and creating `.env`:
-
-```bash
-python generate.py --name Rover
-```
-
-This writes `robot.urdf` at the repository root and writes `Rover.proto` plus
-its referenced meshes under `protos/`. The PROTO name is required. Optional
-`--config PATH` and `--output-dir PATH` arguments select another configuration
-or output location. The script stages the export and conversion before replacing
-the existing PROTO and generated mesh files.
-
-Use another simple Webots identifier for each robot, such as:
+`generate.py` runs the Onshape export and Webots conversion, then creates a
+shareable Webots project folder. Run it from the repository root after
+activating the environment and creating `.env`:
 
 ```bash
 python generate.py --name Kristel
-python generate.py --name Rover --output-dir ./simulation/protos
 ```
 
-Dependencies are listed in `requirements.txt`. Install them in the active
+This writes `robot.urdf` at the repository root and creates
+`generated/Kristel/` with this layout:
+
+```
+generated/Kristel/
+├── protos/
+│   ├── Kristel.proto
+│   └── assets/                 # meshes referenced by the PROTO
+└── controllers/
+    └── rover_drive/
+        ├── rover_drive.py
+        └── runtime.ini
+```
+
+The generated PROTO selects `rover_drive` by default. The package does not include
+a world; add the robot to a world of your choice. To use the package on another
+device, share the whole named folder, register it as a Webots project directory,
+and open or create a world in Webots. Webots must be installed on that device,
+along with Python 3 available as `python` on `PATH`. The generated PROTO targets
+Webots R2025a by default; use R2025a or a newer compatible release.
+
+The package contains no Onshape credentials. `.env` and `config.json` are only
+needed by the person regenerating the model; each user regenerating it must have
+their own Onshape credentials and access to the referenced document.
+
+The PROTO name is required and must be a simple Webots identifier. Optional
+`--config PATH` selects another Onshape configuration. `--output-dir PATH`
+selects the parent directory for the named package (default: `generated/`). For
+example:
+
+```bash
+python generate.py --name Kristel
+python generate.py --name Rover --output-dir ./simulation
+```
+
+If `<output-dir>/<name>/` already exists, generation stops instead of replacing
+it. Pass `--force` to replace that package folder:
+
+```bash
+python generate.py --name Kristel --force
+```
+
+Dependencies are listed in `requirements.txt`; install them in the active
 virtual environment with `pip install -r requirements.txt`. The script does not
-install packages. Each user must supply their own Onshape credentials in `.env`
-and have access to the document in the selected config.
+install packages.
 
 ### config.json reference
 
@@ -90,14 +121,14 @@ onshape-to-robot-clear-cache
 python generate.py --name Rover
 ```
 
-The generated PROTO uses relative `assets/...` mesh paths. Keep the PROTO next to
-the matching `assets/` folder when moving or using the output in Webots.
+The share package keeps the generated PROTO next to its matching `assets/` folder
+under `protos/`. Use `--force` to replace an existing package after a CAD change.
 
 ### Useful urdf2webots options
 
 | Flag | Effect |
 |---|---|
-| `--robot-name=NAME` | PROTO name (must be a valid Webots identifier) |
+| `--robot-name=NAME` | Emit a Robot node string with this name instead of a PROTO; omit it for PROTO conversion (the output filename sets the PROTO name) |
 | `--target=R2025a` | Webots version to target (default `R2025a`; use your installed version) |
 | `--box-collision` | Replace mesh collision shapes with bounding boxes (faster, more stable physics) |
 | `--normal` | Export per-vertex normals for smoother shading |
@@ -105,44 +136,20 @@ the matching `assets/` folder when moving or using the output in Webots.
 | `--init-pos="[0.1,0.1,...]"` | Initial joint positions |
 | `--relative-path-prefix=DIR` | Remap relative mesh paths when the PROTO lives elsewhere |
 
-## Using the PROTO in Webots
+## Using the share package in Webots
 
-Add the robot to a world file (`.wbt`) and make sure the repo is on Webots'
-project path (Preferences → Webots projects), so `Rover.proto` and `assets/` resolve:
+Register the generated folder as a Webots project directory (Preferences → Webots
+projects). Then open or create a world and add the robot's PROTO. The generated
+PROTO defaults to `rover_drive`, which moves the rover forward:
 
 ```
-Rover {
+Kristel {
   translation 0 0 0.05
-  controller "rover_controller"
 }
 ```
 
-Each wheel is a `HingeJoint` with a `RotationalMotor` and `PositionSensor`:
-
-```c
-// rover_controller (C)
-#include <webots/robot.h>
-#include <webots/motor.h>
-
-#define WHEELS 4
-static const char *wheel_names[WHEELS] = {
-  "back_left_wheel", "front_left_wheel", "back_right_wheel", "front_right_wheel"
-};
-
-int main() {
-  wb_robot_init();
-  WbDeviceTag wheels[WHEELS];
-  for (int i = 0; i < WHEELS; i++)
-    wheels[i] = wb_robot_get_device(wheel_names[i]);
-  for (int i = 0; i < WHEELS; i++)
-    wb_motor_set_velocity(wheels[i], 5.0);  // rad/s, capped at maxVelocity
-  while (wb_robot_step(TIME_STEP) != -1) {}
-  wb_robot_cleanup();
-  return 0;
-}
-```
-
-Motor name pattern: `<corner>_<left|right>_wheel`, sensors are `<name>_sensor`.
+The included Python controller drives the wheels forward. Motor names follow
+`<front|back>_<left|right>_wheel`; sensors use the corresponding `_sensor` suffix.
 
 ## Debugging
 
@@ -162,7 +169,7 @@ Motor name pattern: `<corner>_<left|right>_wheel`, sensors are `<name>_sensor`.
 
 | Symptom | Cause / fix |
 |---|---|
-| Webots shows the robot but meshes are missing/red | The PROTO's `assets/...` paths don't resolve. Keep the `.proto` next to `assets/`, re-run the conversion from the repo root, or copy `assets/` beside the PROTO (as done under `protos/`). |
+| Webots shows the robot but meshes are missing/red | The PROTO's `assets/...` paths don't resolve. Keep it beside `assets/` under the package's `protos/` directory and register the package as a Webots project. |
 | `Syntax error` when loading the PROTO | `--target` version is newer than the installed Webots. Regenerate with `--target` set to your Webots version. |
 | Robot parts are flat-colored | Expected: URDF exports carry no textures, so shapes get solid `PBRAppearance` colors. Add textures in Onshape or edit the PROTO appearance by hand. |
 | `Rover_textures/` folder is empty | Normal — there are no texture files to export. |
@@ -173,4 +180,4 @@ Motor name pattern: `<corner>_<left|right>_wheel`, sensors are `<name>_sensor`.
 ### Quick visual checks
 
 - URDF only: `onshape-to-robot-bullet robot.urdf`
-- Full simulation: open any `.wbt` world in Webots with `Rover` inserted, step the simulation, and drag the robot to verify joints and collisions.
+- Full simulation: open or create a `.wbt` world in Webots, add the generated PROTO, and step the simulation to verify the meshes, joints, and controller.
